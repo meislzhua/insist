@@ -1,0 +1,17 @@
+@import '~antd/es/style/themes/default.less';
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: @layout-body-background;
+  height: 100vh;
+
+  .content {
+    padding: 5px;
+    @media screen and (max-width: @screen-sm) {
+      width: 100%;
+    }
+  }
+}
+

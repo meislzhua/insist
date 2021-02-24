@@ -1,0 +1,210 @@
+@import '~antd/es/style/themes/default.less';
+
+.container {
+  position: relative;
+  padding: 5px;
+  min-height: 100%;
+
+  .date {
+    width: 100%;
+    background-color: #FFFFFF;
+    text-align: center;
+
+    @media screen and (max-width: @screen-sm) {
+      border-bottom: 1px solid #dddddd;
+    }
+
+    input {
+      text-align: center;
+    }
+  }
+
+  .addItemBtn {
+    position: fixed;
+    right: 10px;
+    bottom: 60px;
+    box-shadow: 0 0 10px -2px  @green-5;
+    border-radius: 50%;
+    color: @green-5;
+    font-size: 50px;
+
+    &:active {
+      color: @green-3;
+      box-shadow: 0 0 20px 0 @green-5;
+    }
+  }
+
+
+  .diaryItem {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 5px 0;
+
+    .editBtn {
+      margin-right: 10px;
+    }
+
+    .deleteBtn {
+      color: @red-8;
+    }
+  }
+
+  .moodBtnBox {
+    position: fixed;
+    right: 10px;
+    bottom: 120px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+
+
+    .moodBtnIcon {
+
+      font-size: 38px;
+      padding: 6px;
+
+      color: #cccccc;
+      border-radius: 50%;
+      box-shadow: 0 0 10px -2px  #aaaaaa;
+
+      &.moodBtnIconActive {
+        color: #1890ff;
+
+        [data-icon="heart"] {
+          color: #CC0033
+        }
+
+        [data-icon="coffee"] {
+          color: #993333
+        }
+
+        [data-icon="fire"] {
+          color: #FF0033;
+        }
+      }
+
+    }
+  }
+
+}
+
+.internalMoodIcon {
+  font-size: 38px;
+}
+
+
+@media screen and (max-width: @screen-sm) {
+  .dateBox {
+    width: 100%;
+
+    :global {
+      .ant-picker-panel {
+        width: 100%;
+
+        .ant-picker-date-panel {
+          width: 100%;
+
+          .ant-picker-header {
+            width: 100%;
+          }
+
+          .ant-picker-body {
+            width: 100%;
+
+            .ant-picker-content {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+.diaryOptionBox {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  overflow: auto;
+
+
+  .diaryOption {
+    user-select: none;
+    border-bottom: 1px solid #dddddd;
+    display: block;
+    height: 50px;
+    width: 100%;
+    flex-grow: 0;
+
+
+    .diaryOptionTitle {
+      text-align: center;
+      line-height: 50px;
+      font-size: 24px;
+    }
+
+    .diaryOptionOperationBox {
+      text-align: center;
+      line-height: 50px;
+      font-size: 24px;
+      display: flex !important;
+      align-items: stretch;
+      flex-wrap: nowrap;
+
+      .delete {
+        background-color: @btn-danger-bg;
+        color: @btn-danger-color;
+        font-size: 20px;
+        height: 100%;
+      }
+
+      * {
+        flex-grow: 1;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+}
+
+
+.diaryInputForm {
+  height: 100%;
+
+  //为了撑起奇怪的其他组件高度
+  * {
+    height: 100%;
+  }
+
+  .moodInput {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    height: auto;
+    min-height: 100%;
+
+
+    .moodInputItem {
+      height: auto;
+      flex-grow: 1;
+      margin: 5px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+
+      :global {
+        * {
+          height: auto;
+        }
+
+
+      }
+    }
+  }
+}
+
