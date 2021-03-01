@@ -28,6 +28,7 @@ import {
   MehOutlined,
   SmileOutlined
 } from "@ant-design/icons/lib";
+import config from "@/config";
 
 const InternalOption: any = {
   mood: {
@@ -88,10 +89,7 @@ export default class Diary extends React.Component {
   }
 
   getDate() {
-    const date = moment()
-    if (date.hour() < 5) date.subtract(1, "day");
-    date.startOf("day")
-    return date;
+    return moment().subtract(config.dayDelayHour, "hour").startOf("day")
   }
 
   toggleDiaryItemSelectShow({force}: { force?: boolean } = {}) {

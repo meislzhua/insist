@@ -1,30 +1,22 @@
 import React from 'react';
-import {UserOutlined, ReadOutlined, FieldTimeOutlined} from '@ant-design/icons';
+import {UserOutlined, ReadOutlined, ScheduleOutlined} from '@ant-design/icons';
 import {history} from "umi";
 
 
 import styles from './index.less';
 
 export default class Footer extends React.Component {
-  menuItemStyle = {
-    fontSize: "30px",
-    color: "#aaaaaa"
-  }
 
-  getMenuItemStyle({activePath}: { activePath: string }) {
-    const style = {...this.menuItemStyle}
-    if (history.location.pathname === activePath) style.color = "#555555"
-    return style
+  itemClassName({path}: { path: string }) {
+    return [styles.FooterItem, history.location.pathname === path && styles.FooterItemActive].join(" ")
   }
 
   render() {
-    console.log(history.location)
     return (
       <div className={styles.container}>
-        <FieldTimeOutlined style={this.getMenuItemStyle({activePath: "/time"})} onClick={() => history.push("/time")}/>
-        <ReadOutlined style={this.getMenuItemStyle({activePath: "/diary"})} onClick={() => history.push("/diary")}/>
-        <UserOutlined style={this.getMenuItemStyle({activePath: "/user/info"})}
-                      onClick={() => history.push("/user/info")}/>
+        <ScheduleOutlined className={this.itemClassName({path: "/goal"})} onClick={() => history.push("/goal")}/>
+        <ReadOutlined className={this.itemClassName({path: "/diary"})} onClick={() => history.push("/diary")}/>
+        <UserOutlined className={this.itemClassName({path: "/user/info"})} onClick={() => history.push("/user/info")}/>
       </div>
     )
   }

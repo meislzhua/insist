@@ -19,6 +19,11 @@
     component: './Diary/index',
   },
   {
+    name: 'goal',
+    path: '/goal',
+    component: './Goal/index',
+  },
+  {
     path: '/welcome',
     name: 'welcome',
     icon: 'smile',
