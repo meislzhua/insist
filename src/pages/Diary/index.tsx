@@ -17,8 +17,7 @@ import {
   Modal,
   Radio
 } from "antd";
-import * as Dao from "@/services/Dao";
-import {DiaryItem} from "@/services/Dao";
+import * as Dao from "@/services/Dao/index";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import {
   CoffeeOutlined, DislikeOutlined,
@@ -29,6 +28,9 @@ import {
   SmileOutlined
 } from "@ant-design/icons/lib";
 import config from "@/config";
+// @ts-ignore
+import {DiaryItem} from "@/services/Dao/struct/diary/DiaryItem";
+import {DiaryOption} from "@/services/Dao/struct/diary/DiaryOption";
 
 const InternalOption: any = {
   mood: {
@@ -57,7 +59,7 @@ export default class Diary extends React.Component {
     isLoading: false,  // 是否正在请求网络
     date: this.getDate(),
     diary: null,
-    diaryItems: [] as Dao.DiaryItem[],
+    diaryItems: [] as DiaryItem[],
     isDiaryOptionSelectShow: false,
     isAddDiaryOptionShow: false,
     diaryOption: [],
@@ -67,18 +69,18 @@ export default class Diary extends React.Component {
 
   get showDiaryOptions() {
     const keys: any = {}
-    this.state.diaryItems.forEach((item: Dao.DiaryItem) => {
+    this.state.diaryItems.forEach((item: DiaryItem) => {
       keys[item.optionId] = 1
     })
-    return this.state.diaryOption.filter((item: Dao.DiaryOption) => !keys[item.objectId])
+    return this.state.diaryOption.filter((item: DiaryOption) => !keys[item.objectId])
   }
 
   get showDiaryItems() {
-    return this.state.diaryItems.filter((option: Dao.DiaryItem) => option.type !== "mood")
+    return this.state.diaryItems.filter((option: DiaryItem) => option.type !== "mood")
   }
 
-  get moodDiaryItem(): Dao.DiaryItem | undefined {
-    return this.state.diaryItems.find((option: Dao.DiaryItem) => option.type === "mood")
+  get moodDiaryItem(): DiaryItem | undefined {
+    return this.state.diaryItems.find((option: DiaryItem) => option.type === "mood")
   }
 
 
@@ -104,13 +106,13 @@ export default class Diary extends React.Component {
     this.toggleDiaryItemSelectShow()
   }
 
-  async toggleDiaryInputShow({option}: { option?: Dao.DiaryOption } = {}) {
+  async toggleDiaryInputShow({option}: { option?: DiaryOption } = {}) {
     return new Promise(resolve => this.setState({diaryInputOption: option}, () => resolve(null)))
 
   }
 
-  editDiaryItemShow({option, item}: { option?: Dao.DiaryOption, item: Dao.DiaryItem }) {
-    let targetOption: Dao.DiaryOption | undefined = option || this.state.diaryOption.find((v: any) => v.objectId === item.optionId)
+  editDiaryItemShow({option, item}: { option?: DiaryOption, item: DiaryItem }) {
+    let targetOption: DiaryOption | undefined = option || this.state.diaryOption.find((v: any) => v.objectId === item.optionId)
     console.log("发生编辑事件", targetOption, item)
 
     if (targetOption) {
@@ -124,22 +126,22 @@ export default class Diary extends React.Component {
   }
 
   async refreshDiaryOption() {
-    const list = await Dao.getDiaryOption();
+    const list = await Dao.diary.getDiaryOption();
     this.setState({diaryOption: list})
     console.log("更新option", list)
 
   }
 
   async refreshDiary() {
-    const diary = await Dao.getDiary({date: this.state.date.toDate()});
+    const diary = await Dao.diary.getDiary({date: this.state.date.toDate()});
     this.setState({diaryItems: diary?.items || []})
     this.setState({diary})
   }
 
   event_saveDiaryInput() {
-    const option: Dao.DiaryOption | null = this.state.diaryInputOption;
-    const father = option || {} as Dao.DiaryOption
-    const item: Dao.DiaryItem = {
+    const option: DiaryOption | null = this.state.diaryInputOption;
+    const father = option || {} as DiaryOption
+    const item: DiaryItem = {
       title: father.title,
       type: father.type,
       optionId: father.objectId,
@@ -150,9 +152,9 @@ export default class Diary extends React.Component {
 
     if (father.itemId) {
       item.objectId = father.itemId;
-      Dao.editDiaryItem({item})
+      Dao.diary.editDiaryItem({item})
         .then(() => {
-          const index = this.state.diaryItems.findIndex((v: Dao.DiaryItem) => v.objectId === item.objectId)
+          const index = this.state.diaryItems.findIndex((v: DiaryItem) => v.objectId === item.objectId)
           console.log("修改前", this.state.diaryItems, index)
           if (index !== undefined && index !== null) this.state.diaryItems.splice(index, 1, item)
           else this.state.diaryItems.push(item)
@@ -173,14 +175,14 @@ export default class Diary extends React.Component {
 
   async addDiaryOption(data: any): Promise<any> {
     if (data === undefined) return null;
-    return Dao.saveDiaryOption(data)
+    return Dao.diary.saveDiaryOption(data)
       .then(() => data)
   }
 
   async addDiaryItem({date, item}: { date: Date, item: DiaryItem }): Promise<any> {
     if (date === undefined || item === undefined) return null;
 
-    return Dao.addDiaryItem({date, item})
+    return Dao.diary.addDiaryItem({date, item})
       .then(data => this.setState({diaryItems: [...this.state.diaryItems, data]}))
       .then(() => this.writeDiaryItemFrom.current?.resetFields())
 
@@ -189,7 +191,7 @@ export default class Diary extends React.Component {
   async removeDiaryItem({date, item}: { date: Date, item: DiaryItem }): Promise<any> {
     if (date === undefined || item === undefined) return null;
 
-    return Dao.removeDiaryItem({date, item})
+    return Dao.diary.removeDiaryItem({date, item})
       .then(() => this.setState({diaryItems: this.state.diaryItems.filter(f => f !== item)}))
 
   }
@@ -199,7 +201,7 @@ export default class Diary extends React.Component {
     let content = <div className={styles.diaryOptionBox}><Empty description={"已经完成记录!"}/></div>
     if (this.showDiaryOptions.length) content = <div className={styles.diaryOptionBox}>
       {
-        this.showDiaryOptions.map((option: Dao.DiaryOption) => {
+        this.showDiaryOptions.map((option: DiaryOption) => {
           return (
             <div className={styles.diaryOption} key={option.objectId}>
               <Carousel dots={false} effect={"scrollx"}>
@@ -212,7 +214,7 @@ export default class Diary extends React.Component {
                 </div>
                 <div className={styles.diaryOptionOperationBox}>
                   <div className={styles.delete} onClick={() => {
-                    Dao.deleteDiaryOption({option})
+                    Dao.diary.deleteDiaryOption({option})
                       .then(() => this.refreshDiaryOption())
                   }}>删除
                   </div>
@@ -342,7 +344,7 @@ export default class Diary extends React.Component {
                       }}
           />
         </div>
-        {this.showDiaryItems.map((item: Dao.DiaryItem) => {
+        {this.showDiaryItems.map((item: DiaryItem) => {
           return (
             <div key={item.objectId}>
               <Card size="small" title={item.title} className={styles.diaryItem}
