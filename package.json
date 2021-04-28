@@ -35,7 +35,7 @@
     "upload": "ts-node upload.ts",
     "buildAndUpload": "npm run build && npm run upload",
     "electron": "electron .",
-    "electron-dev": "electron . --dev"
+    "electron-dev": "electron . --debug"
   },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",
