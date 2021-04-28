@@ -28,7 +28,6 @@ import {
   SmileOutlined
 } from "@ant-design/icons/lib";
 import config from "@/config";
-// @ts-ignore
 import {DiaryItem} from "@/services/Dao/struct/diary/DiaryItem";
 import {DiaryOption} from "@/services/Dao/struct/diary/DiaryOption";
 

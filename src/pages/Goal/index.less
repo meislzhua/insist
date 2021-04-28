@@ -2,16 +2,22 @@
 
 .container {
   position: relative;
-  padding: 10px;
-  min-height: 100%;
-  padding-top: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .GoalItemBox {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 5px 10px 10px 10px;
+  }
+
+  .GoalItem {
     padding: 5px 10px;
     //border: 1px solid #aaaaaa;
     margin-bottom: 10px;
     outline: none;
-    box-shadow: 0 0 8px -3px #cccccc;
+    box-shadow: 0 0 8px -3px #aaaaaa;
     border-radius: 3px;
     transition: height 0.3s;
 
@@ -61,18 +67,28 @@
 
   }
 
-  .addItemBtn {
-    position: fixed;
-    right: 10px;
-    bottom: 60px;
-    box-shadow: 0 0 10px -2px  @green-5;
-    border-radius: 50%;
-    color: @green-5;
-    font-size: 50px;
+  .addItemBox {
+    padding: 5px;
+    width: 100%;
 
-    &:active {
-      color: @green-3;
-      box-shadow: 0 0 20px 0 @green-5;
+
+    .addItemBtn {
+      width: 100%;
+      padding: 5px;
+      color: #aaa;
+      height: auto;
+      font-size: larger;
+      flex-grow: 0;
+      flex-shrink: 0;
     }
+
+  }
+
+  .calendar {
+    box-shadow: 0 0 5px -2px #aaa;
+    margin-bottom: 10px;
+    flex-grow: 0;
+    flex-shrink: 0;
+
   }
 }

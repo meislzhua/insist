@@ -1,17 +1,20 @@
 import React from 'react';
 import styles from "./index.less";
 import {Button, Drawer, Form, FormInstance, Input, message, Modal, Select} from "antd";
-import * as Dao from "@/services/Dao";
+import * as Dao from "@/services/Dao/index";
+import {Calendar} from 'antd';
 
 import {getIntl} from 'umi';
 import {
   CheckSquareOutlined,
   CloseSquareOutlined,
   DeleteFilled,
-  EditFilled, PlusCircleOutlined,
+  EditFilled,
+  PlusOutlined
 } from "@ant-design/icons";
 import {CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined} from "@ant-design/icons/lib";
 import moment from "moment";
+import {Goal} from "@/services/Dao/struct/goal/Goal";
 
 
 export default class Diary extends React.Component {
@@ -19,22 +22,44 @@ export default class Diary extends React.Component {
 
   state: any = {
     goals: [],
-    isGoalAddShow: false
+    history: {},
+    isGoalAddShow: false,
+    selectedDate: moment()
   }
 
-  constructor(props: {}, context: any) {
-    super(props, context);
+
+  componentDidMount() {
+    this.setState({selectedDate: moment().startOf("day")})
     this.refreshGoals().catch(e => e)
+    this.refreshGoalHistory().catch(e => e)
   }
 
   get showGoals() {
-    return this.state.goals
+    if (moment().startOf("day").isAfter(this.state.selectedDate, "day")) return [];
+    return this.state.goals;
+  }
+
+  get showGoalHistory() {
+    console.log("当天历史", this.state.history, moment().format("YYYY-MM-DD"), this.state.history[moment().format("YYYY-MM-DD")])
+    return this.state.history[this.state.selectedDate.format("YYYY-MM-DD")] || [];
   }
 
   async refreshGoals() {
-    const goals = await Dao.listGoals();
-    console.log("获取到的goals", goals)
+    const goals = await Dao.goal.listGoals();
     this.setState({goals})
+  }
+
+  async refreshGoalHistory() {
+    const startTime = this.state.selectedDate.clone().startOf("month").subtract(1, "month").toDate()
+    const endTime = this.state.selectedDate.clone().startOf("month").add(1, "month").toDate()
+    const history = (await Dao.goal.listGoalsHistory({startTime, endTime})).reduce((p: any, v) => {
+      // 按照日期建立数组
+      const key = moment(v.date).format("YYYY-MM-DD");
+      // eslint-disable-next-line no-param-reassign
+      (p[key] = p[key] || []).push(v);
+      return p
+    }, {})
+    this.setState({history})
   }
 
   toggleAddGoalShow({force}: { force?: boolean } = {}) {
@@ -42,7 +67,7 @@ export default class Diary extends React.Component {
     else this.setState({isGoalAddShow: !this.state.isGoalAddShow})
   }
 
-  event_deleteGoal({goal}: { goal: Dao.Goal }) {
+  event_deleteGoal({goal}: { goal: Goal }) {
     if (goal === undefined) return null;
     return Modal.confirm({
       title: '是否删除你的小目标?',
@@ -53,14 +78,14 @@ export default class Diary extends React.Component {
       cancelText: '还是坚持一下吧',
       maskClosable: true,
       centered: true,
-      onOk: () => Dao.deleteGoal({goal})
+      onOk: () => Dao.goal.deleteGoal({goal})
         .then(() => this.setState({goals: this.state.goals.filter((f: any) => f !== goal)}))
         .catch(err => message.error(`移除失败: ${err.message}`))
     })
 
   }
 
-  event_finishGoal({isSuccess, goal, content}: { isSuccess: boolean, goal: Dao.Goal, content?: string }) {
+  event_finishGoal({isSuccess, goal, content}: { isSuccess: boolean, goal: Goal, content?: string }) {
     return Modal.confirm({
       title: isSuccess ? "已经完成了吗" : '失败了吗',
       icon: isSuccess ?
@@ -72,26 +97,21 @@ export default class Diary extends React.Component {
       cancelText: 'no',
       maskClosable: true,
       centered: true,
-      onOk: () => {
-        let task: Promise<any> = Promise.reject();
-        if (goal.repetition === "once") {
-          task = Dao.finishGoal({goal, isSuccess})
-        } else {
-          let nextDay;
-          if (goal.repetition === "day") nextDay = moment().startOf("day").add(1, "day").toDate()
-          if (goal.repetition === "week") nextDay = moment().startOf("isoWeek").add(1, "week").toDate()
-          if (goal.repetition === "month") nextDay = moment().startOf("month").add(1, "month").toDate()
-          if (goal.repetition === "appoint_week") nextDay = moment().startOf("day").add(1, "day").toDate()
-
-          task = Dao.finishGoal({goal, isSuccess, nextDay, content})
-        }
-
-        task
+      onOk: async () => {
+        await Dao.goal.finishGoal({goal, isSuccess, content})
           .then(() => this.setState({goals: this.state.goals.filter((f: any) => f !== goal)}))
           .catch(err => message.error(`操作失败: ${err.message}`))
 
+        await this.refreshGoals().catch(e => e)
+        await this.refreshGoalHistory().catch(e => e)
       }
     })
+  }
+
+  event_selectDay({date}: { date: any }) {
+    const isUpdate = this.state.selectedDate.isSame(date, "month");
+    this.setState({selectedDate: date.startOf("day")});
+    if (isUpdate) this.refreshGoalHistory().catch(() => null)
   }
 
   module_goalAddBox() {
@@ -107,7 +127,7 @@ export default class Diary extends React.Component {
                   type="primary"
                   style={{width: "100%"}}
                   onClick={() => {
-                    Dao.addGoal({goal: this.addGoalFrom.current?.getFieldsValue()})
+                    Dao.goal.addGoal({goal: this.addGoalFrom.current?.getFieldsValue()})
                       .then(data => this.setState({goals: [...this.state.goals, data]}))
                       .then(() => this.toggleAddGoalShow())
                       .catch(err => message.error(`增加目标失败: ${err.message}`))
@@ -136,31 +156,53 @@ export default class Diary extends React.Component {
   render() {
     const intl = getIntl()
     return (
-      <div className={styles.container}>
+      <div style={{height: "100%"}}>
+        <div className={styles.container}>
+          <Calendar fullscreen={false} value={this.state.selectedDate} className={styles.calendar}
+                    onChange={date => this.event_selectDay({date})}/>
 
-        {this.showGoals.map((goal: any) => {
-          // @ts-ignore
-          return <div tabIndex="0" key={goal.objectId} className={styles.GoalItemBox}>
-            <div className={styles.GoalItemTitle}>{goal.title}</div>
-            <div className={styles.GoalItemContent}>{goal.content}</div>
-            <div className={styles.GoalItemInfo}>
-              <div className={styles.GoalItemInfoRepetition}>{intl.formatMessage({id: `goal.${goal.repetition}`})}</div>
-            </div>
-            <div className={styles.GoalItemOperation}>
-              <DeleteFilled onClick={() => this.event_deleteGoal({goal})} style={{color: "#990033"}}/>
+          <div className={styles.GoalItemBox}>
+            {this.showGoals.map((goal: any) => {
+              // @ts-ignore
+              return <div tabIndex="0" key={goal.objectId} className={styles.GoalItem}>
+                <div className={styles.GoalItemTitle}>{goal.title}</div>
+                <div className={styles.GoalItemContent}>{goal.content}</div>
+                <div className={styles.GoalItemInfo}>
+                  <div
+                    className={styles.GoalItemInfoRepetition}>{intl.formatMessage({id: `goal.${goal.repetition}`})}</div>
+                </div>
+                <div className={styles.GoalItemOperation}>
+                  <DeleteFilled onClick={() => this.event_deleteGoal({goal})} style={{color: "#990033"}}/>
 
-              <EditFilled/>
-              <CloseSquareOutlined onClick={() => this.event_finishGoal({isSuccess: false, goal})}
-                                   style={{color: "#CC0033"}}/>
-              <CheckSquareOutlined onClick={() => this.event_finishGoal({isSuccess: true, goal})}
-                                   style={{color: "#99CC00"}}/>
-            </div>
+                  <EditFilled/>
+                  <CloseSquareOutlined onClick={() => this.event_finishGoal({isSuccess: false, goal})}
+                                       style={{color: "#CC0033"}}/>
+                  <CheckSquareOutlined onClick={() => this.event_finishGoal({isSuccess: true, goal})}
+                                       style={{color: "#99CC00"}}/>
+                </div>
+
+              </div>
+            })}
+            {this.showGoalHistory.map((history: any) => {
+              // @ts-ignore
+              return <div tabIndex="0" key={history.objectId} className={styles.GoalItem}>
+                <div className={styles.GoalItemTitle}>{history.title}</div>
+                <div className={styles.GoalItemContent}>{history.content}</div>
+
+
+              </div>
+            })}
+          </div>
+          <div className={styles.addItemBox}>
+            <Button type="dashed" className={styles.addItemBtn} onClick={() => this.toggleAddGoalShow()}>
+              <PlusOutlined/>
+            </Button>
 
           </div>
-        })}
-        <PlusCircleOutlined className={styles.addItemBtn} onClick={() => this.toggleAddGoalShow()}/>
-        {this.module_goalAddBox()}
 
+
+        </div>
+        {this.module_goalAddBox()}
       </div>
     );
   }
