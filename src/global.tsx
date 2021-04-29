@@ -1,7 +1,8 @@
 import {Button, message, notification} from 'antd';
+import * as EventEmitter from 'events';
 
 import React from 'react';
-import {useIntl} from 'umi';
+import {useIntl, history} from 'umi';
 import defaultSettings from '../config/defaultSettings';
 
 const {pwa} = defaultSettings;
@@ -89,3 +90,11 @@ if (pwa) {
     });
   }
 }
+
+
+// 全局指定
+const win: any = window;
+win.insist = {
+  event: new EventEmitter(),
+  history
+};

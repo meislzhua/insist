@@ -7,7 +7,22 @@ class InsistShortcut {
   constructor({share}) {
     this.share = share;
     app.whenReady().then(async () => {
-      let ret = globalShortcut.register("ctrl+shift+alt+q", () => share.window.showOrHide())
+      //快速隐藏,显示
+      globalShortcut.register("ctrl+shift+alt+q", () => share.window.showOrHide())
+      //快速添加任务
+      globalShortcut.register("ctrl+shift+alt+a", () => {
+        share.window.showOrHide({force: true})
+        share.window.runJS(async () => {
+          window.insist.history.push("/goal");
+
+          let count = 20;
+          let delay = 500;
+          while (count-- && !window.insist.event.emit("addGoalInPage")) {
+            await new Promise(resolve => setTimeout(resolve, delay))
+          }
+        })
+      })
+
     })
   }
 }

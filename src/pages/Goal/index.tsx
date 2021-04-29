@@ -21,6 +21,7 @@ import GoalAddBox from "@/pages/Goal/components/GoalAddBox";
 export default class GoalPage extends React.Component {
   addGoalFrom = React.createRef<FormInstance>();
   goalAddBox?: GoalAddBox;
+
   state: any = {
     goals: [],
     history: {},
@@ -31,6 +32,16 @@ export default class GoalPage extends React.Component {
   componentDidMount() {
     this.setState({selectedDate: moment().startOf("day")})
     this.refreshAll().catch(e => e)
+    const win: any = window;
+    win.insist.event.addListener("addGoalInPage", () => this.goalAddBox?.toggleAddGoalShow({
+      force: true,
+      day: this.state.selectedDate
+    }))
+  }
+
+  componentWillUnmount() {
+    const win: any = window;
+    win.insist.event.removeAllListeners("addGoalInPage")
   }
 
   get showGoals() {
@@ -39,7 +50,6 @@ export default class GoalPage extends React.Component {
   }
 
   get showGoalHistory() {
-    console.log("当天历史", this.state.history, moment().format("YYYY-MM-DD"), this.state.history[moment().format("YYYY-MM-DD")])
     return this.state.history[this.state.selectedDate.format("YYYY-MM-DD")] || [];
   }
 

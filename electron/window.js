@@ -2,7 +2,6 @@ const {app, BrowserWindow, screen} = require('electron')
 
 class InsistWindow {
   share;
-  isShow = false
 
   constructor({share}) {
     this.share = share;
@@ -16,7 +15,7 @@ class InsistWindow {
         skipTaskbar: true,
         resizable: false,
         alwaysOnTop: true,
-        show: this.isShow
+        show: false
       });
       await this.win.loadURL(this.share.config.url);
       if (this.share.config.env === "dev") this.win.webContents.openDevTools({mode: "detach"})
@@ -27,10 +26,9 @@ class InsistWindow {
     this.win.webContents.executeJavaScript(`(${func.toString()})();`)
   }
 
-  showOrHide() {
-    if (!this.isShow) this.win.show()
+  showOrHide({force} = {}) {
+    if (force || !this.win.isVisible()) this.win.show()
     else this.win.hide()
-    this.isShow = !this.isShow;
   }
 }
 
