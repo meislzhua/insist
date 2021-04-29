@@ -41,6 +41,7 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
           if (data.appointDate) data.appointDate = moment(data.appointDate)
           this.addGoalFrom.current?.setFieldsValue(data)
         } else this.addGoalFrom.current?.resetFields();
+        if (moment().isBefore(day, "day")) this.addGoalFrom.current?.setFieldsValue({appointDate: day?.clone()})
         this.setState({editGoal, day, form: this.addGoalFrom.current?.getFieldsValue()})
         setTimeout(() => this.addGoalFrom.current?.getFieldInstance("title")?.focus(), 0)
       }
