@@ -8,6 +8,7 @@ export interface Goal extends AVObject {
   repetition: "once" | "day" | "week" | "month" | "appoint_week" | "appoint_month"
   repetitionCount: number
   appoint?: number
+  appointDate?: Date
 }
 
 

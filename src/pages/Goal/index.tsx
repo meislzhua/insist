@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from "./index.less";
-import {Button, Drawer, Form, FormInstance, Input, message, Modal, Select} from "antd";
+import {Button, FormInstance, message, Modal} from "antd";
 import * as Dao from "@/services/Dao/index";
 import {Calendar} from 'antd';
 
@@ -15,11 +15,12 @@ import {
 import {CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined} from "@ant-design/icons/lib";
 import moment from "moment";
 import {Goal} from "@/services/Dao/struct/goal/Goal";
+import GoalAddBox from "@/pages/Goal/components/GoalAddBox";
 
 
-export default class Diary extends React.Component {
+export default class GoalPage extends React.Component {
   addGoalFrom = React.createRef<FormInstance>();
-
+  goalAddBox?: GoalAddBox;
   state: any = {
     goals: [],
     history: {},
@@ -27,11 +28,9 @@ export default class Diary extends React.Component {
     selectedDate: moment()
   }
 
-
   componentDidMount() {
     this.setState({selectedDate: moment().startOf("day")})
-    this.refreshGoals().catch(e => e)
-    this.refreshGoalHistory().catch(e => e)
+    this.refreshAll().catch(e => e)
   }
 
   get showGoals() {
@@ -62,9 +61,11 @@ export default class Diary extends React.Component {
     this.setState({history})
   }
 
-  toggleAddGoalShow({force}: { force?: boolean } = {}) {
-    if (force !== undefined) this.setState({isGoalAddShow: force})
-    else this.setState({isGoalAddShow: !this.state.isGoalAddShow})
+  async refreshAll() {
+    return Promise.all([
+      this.refreshGoalHistory(),
+      this.refreshGoals(),
+    ])
   }
 
   event_deleteGoal({goal}: { goal: Goal }) {
@@ -102,8 +103,7 @@ export default class Diary extends React.Component {
           .then(() => this.setState({goals: this.state.goals.filter((f: any) => f !== goal)}))
           .catch(err => message.error(`操作失败: ${err.message}`))
 
-        await this.refreshGoals().catch(e => e)
-        await this.refreshGoalHistory().catch(e => e)
+        await this.refreshAll()
       }
     })
   }
@@ -112,44 +112,6 @@ export default class Diary extends React.Component {
     const isUpdate = this.state.selectedDate.isSame(date, "month");
     this.setState({selectedDate: date.startOf("day")});
     if (isUpdate) this.refreshGoalHistory().catch(() => null)
-  }
-
-  module_goalAddBox() {
-    return (
-      <Drawer
-        placement="bottom" closable={false}
-        onClose={() => this.toggleAddGoalShow()}
-        visible={this.state.isGoalAddShow}
-        bodyStyle={{padding: "5px"}}
-        height={"50%"}
-        footer={
-          <Button block
-                  type="primary"
-                  style={{width: "100%"}}
-                  onClick={() => {
-                    Dao.goal.addGoal({goal: this.addGoalFrom.current?.getFieldsValue()})
-                      .then(data => this.setState({goals: [...this.state.goals, data]}))
-                      .then(() => this.toggleAddGoalShow())
-                      .catch(err => message.error(`增加目标失败: ${err.message}`))
-                  }}
-          >
-            确定
-          </Button>
-        }>
-        <Form ref={this.addGoalFrom} initialValues={{repetition: "once"}}>
-          <Form.Item label="重复类型" name={'repetition'}>
-            <Select>
-              <Select.Option value="once">单次</Select.Option>
-              <Select.Option value="day">每日</Select.Option>
-              <Select.Option value="week">每周</Select.Option>
-              <Select.Option value="month">每月</Select.Option>
-              <Select.Option value="appoint_week">指定星期几</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="选项标题" name={'title'}><Input placeholder="请输入你想要记录的类型的名字"/></Form.Item>
-        </Form>
-      </Drawer>
-    )
   }
 
 
@@ -174,7 +136,11 @@ export default class Diary extends React.Component {
                 <div className={styles.GoalItemOperation}>
                   <DeleteFilled onClick={() => this.event_deleteGoal({goal})} style={{color: "#990033"}}/>
 
-                  <EditFilled/>
+                  <EditFilled onClick={() => this.goalAddBox?.toggleAddGoalShow({
+                    force: true,
+                    day: this.state.selectedDate,
+                    editGoal: goal
+                  })}/>
                   <CloseSquareOutlined onClick={() => this.event_finishGoal({isSuccess: false, goal})}
                                        style={{color: "#CC0033"}}/>
                   <CheckSquareOutlined onClick={() => this.event_finishGoal({isSuccess: true, goal})}
@@ -194,15 +160,16 @@ export default class Diary extends React.Component {
             })}
           </div>
           <div className={styles.addItemBox}>
-            <Button type="dashed" className={styles.addItemBtn} onClick={() => this.toggleAddGoalShow()}>
+            <Button type="dashed" className={styles.addItemBtn}
+                    onClick={() => this.goalAddBox?.toggleAddGoalShow({day: this.state.selectedDate})}>
               <PlusOutlined/>
             </Button>
-
           </div>
-
-
         </div>
-        {this.module_goalAddBox()}
+        <GoalAddBox
+          ref={box => box ? this.goalAddBox = box : null}
+          onSubmit={() => this.refreshAll()}
+        />
       </div>
     );
   }

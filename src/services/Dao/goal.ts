@@ -18,11 +18,20 @@ export async function listGoalsHistory({startTime, endTime}: { startTime?: Date,
 
 export async function addGoal({goal}: { goal: Goal }) {
   if (!goal) throw new Error("增加goal不可为空");
-  const db_diary = new AV.Object("Goal")
-  db_diary.set(goal)
-  db_diary.set("owner", AV.User.current())
-  await db_diary.save()
-  return db_diary.toJSON()
+  const db_goal = new AV.Object("Goal")
+  db_goal.set(goal)
+  db_goal.set("owner", AV.User.current())
+  await db_goal.save()
+  return db_goal.toJSON()
+}
+
+export async function editGoal({goal, id}: { goal: Goal, id: any }) {
+  if (!goal || !id) throw new Error("增加goal不可为空");
+  const db_goal = AV.Object.createWithoutData('Goal', id);
+  db_goal.set(goal)
+  db_goal.set("owner", AV.User.current())
+  await db_goal.save()
+  return db_goal.toJSON()
 }
 
 export async function deleteGoal({goal}: { goal: Goal }) {
