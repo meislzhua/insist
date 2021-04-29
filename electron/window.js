@@ -11,7 +11,7 @@ class InsistWindow {
         width: 400,
         height: screen.getPrimaryDisplay().workAreaSize.height,
         y: 0,
-        x: screen.getPrimaryDisplay().workAreaSize.width - 400 - 5,
+        x: screen.getPrimaryDisplay().workAreaSize.width - 400 ,
         frame: false,
         skipTaskbar: true,
         resizable: false,
@@ -19,6 +19,7 @@ class InsistWindow {
         show: this.isShow
       });
       await this.win.loadURL(this.share.config.url);
+      if (this.share.config.env === "dev") this.win.webContents.openDevTools({mode: "detach"})
     })
   }
 

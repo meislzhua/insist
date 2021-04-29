@@ -1,4 +1,4 @@
-const {app, Menu, Tray} = require('electron')
+const {app, Menu, Tray, dialog} = require('electron')
 const path = require('path')
 
 
@@ -12,6 +12,15 @@ class InsistTray {
       this.tray = new Tray(path.join(__dirname, './icon/icon.ico'))
       const contextMenu = Menu.buildFromTemplate([
         {label: '测试版本'},
+        {
+          label: '开机启动',
+          checked: app.getLoginItemSettings().openAtLogin, // 获取当前自启动状态
+          type: 'checkbox',
+          click: () => {
+            app.setLoginItemSettings({openAtLogin: !app.getLoginItemSettings().openAtLogin, path: process.execPath})
+          }
+        },
+
         {label: '设置(尚未开发)'},
         {
           label: '显示/隐藏', click() {
@@ -31,12 +40,10 @@ class InsistTray {
 
       //设定事件
       // this.tray.on("click",()=>this.share.window.showOrHide())
-      this.tray.on("double-click",()=>this.share.window.showOrHide())
+      this.tray.on("double-click", () => this.share.window.showOrHide())
 
 
     })
-
-
 
 
   }
