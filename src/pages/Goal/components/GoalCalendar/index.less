@@ -1,0 +1,43 @@
+.calendar {
+  box-shadow: 0 0 5px -2px #aaa;
+  margin-bottom: 10px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  user-select: none;
+
+}
+
+
+.calendarHeader {
+  text-align: center;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+
+  .calendarHeaderDate {
+    font-size: 18px;
+    color: #666666;
+    user-select: none;
+    padding: 5px;
+    flex-grow: 2;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out 0s,;
+
+    &:hover {
+      color: #000000;
+    }
+  }
+
+  .HeaderIcon {
+    font-size: 20px;
+    padding: 8px;
+    line-height: 100%;
+    color: #dddddd;
+    transition: all 0.3s ease-in-out 0s,;
+    cursor: pointer;
+
+    &:hover {
+      color: #666666;
+    }
+  }
+}
