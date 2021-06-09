@@ -1,5 +1,6 @@
 @import '~antd/es/style/themes/default.less';
 
+@dateWith: 24px;
 .calendar {
   box-shadow: 0 0 5px -2px #aaa;
   margin-bottom: 10px;
@@ -46,13 +47,14 @@
 
 }
 
-.onHover {
+.onHover() {
   .date {
-    background-color: @primary-7 !important;
+    box-sizing: border-box;
+    border: 2px solid @primary-7;
+    background-color: @primary-7;
     color: #ffffff;
+    line-height: @dateWith - 4px;
   }
-
-
 }
 
 
@@ -62,12 +64,16 @@
   position: relative;
   display: flex;
   justify-content: center;
+  @media (any-hover: hover) {
+    &:hover {
+      .onHover();
+    }
 
-  &:hover:extend(.onHover all) {
   }
 
-  &.active:extend(.onHover all) {
 
+  &.active {
+    .onHover();
   }
 
 
@@ -156,25 +162,10 @@
 
 
   .date {
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
+    width: @dateWith;
+    height: @dateWith;
+    line-height: @dateWith;
     transition: all ease-in-out 0.2s 0s;
-    border-radius: 3px;
-
-
-  }
-
-  .info {
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    transition: all ease-in-out 0.2s 0s;
-    position: absolute;
-    opacity: 0;
-
-    background-color: #1890ff;
-    color: #fff;
     border-radius: 3px;
   }
 
