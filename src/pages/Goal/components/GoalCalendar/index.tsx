@@ -8,9 +8,11 @@ import {
   RightOutlined,
   DoubleRightOutlined
 } from "@ant-design/icons";
+import {GoalLogic} from "@/services/logic/goal";
 
 interface GoalCalendarProps {
   onChange?: ({date, last}: { date: moment.Moment, last: moment.Moment }) => void;
+  calendarData?: any;
 }
 
 interface GoalCalendarStates {
@@ -28,7 +30,6 @@ export default class GoalCalendar extends React.Component<GoalCalendarProps, Goa
   }
 
   onDateChange(date: moment.Moment) {
-    console.log("日历改变了日期")
     this.props.onChange?.({date, last: this.state.selectedDate.clone()});
     this.setState({selectedDate: date});
   }
@@ -52,12 +53,44 @@ export default class GoalCalendar extends React.Component<GoalCalendarProps, Goa
     )
   }
 
+  getCellData({date}: { date: moment.Moment }): { success: number, fail: number, goals: number, } {
+    console.log("目标数据", this.props.calendarData)
+    return this.props.calendarData[GoalLogic.getDateKey({date})] || {
+      success: 0,
+      fail: 0,
+      goals: 0,
+    }
+  }
+
+  dateCell({date}: { date: moment.Moment }) {
+    const data = this.getCellData({date});
+    const classNames = [styles.dateCell];
+    if (this.state.selectedDate.isSame(date, "day")) classNames.push(styles.active);
+    if (data.success) {
+      classNames.push(styles.success);
+      if (data.success >= 5) classNames.push("s-5")
+      else classNames.push(styles[`s-${data.success}`])
+    }
+    if (data.fail) {
+      classNames.push(styles.fail);
+      if (data.fail >= 5) classNames.push("f-5")
+      else classNames.push(styles[`f-${data.fail}`])
+    }
+    return (
+      <div className={classNames.join(" ")}>
+        <div className={styles.date}>{date.date()}</div>
+        {data.goals ? (<div className={styles.goals}>{data.goals}</div>) : ""}
+      </div>
+    )
+  }
+
   render() {
     return (
       <Calendar fullscreen={false}
                 value={this.state.selectedDate} className={styles.calendar}
                 onChange={date => this.onDateChange(date)}
                 headerRender={() => this.header()}
+                dateFullCellRender={(date) => this.dateCell({date})}
       />
 
     )

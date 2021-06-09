@@ -1,3 +1,5 @@
+@import '~antd/es/style/themes/default.less';
+
 .calendar {
   box-shadow: 0 0 5px -2px #aaa;
   margin-bottom: 10px;
@@ -21,7 +23,7 @@
     padding: 5px;
     flex-grow: 2;
     cursor: pointer;
-    transition: all 0.3s ease-in-out 0s,;
+    transition: all 0.3s ease-in-out 0s;
 
     &:hover {
       color: #000000;
@@ -33,11 +35,160 @@
     padding: 8px;
     line-height: 100%;
     color: #dddddd;
-    transition: all 0.3s ease-in-out 0s,;
+    transition: all 0.3s ease-in-out 0s;
     cursor: pointer;
 
     &:hover {
       color: #666666;
     }
+  }
+
+
+}
+
+.onHover {
+  .date {
+    background-color: @primary-7 !important;
+    color: #ffffff;
+  }
+
+
+}
+
+
+.dateCell {
+  transition: all ease-in-out 0.3s 0s;
+  z-index: 2;
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  &:hover:extend(.onHover all) {
+  }
+
+  &.active:extend(.onHover all) {
+
+  }
+
+
+  &.success {
+
+    &.s-1 {
+      .date {
+        color: #fff;
+        background-color: @green-2;
+
+      }
+    }
+
+    &.s-2 {
+      .date {
+        color: #fff;
+        background-color: @green-3;
+
+      }
+    }
+
+    &.s-3 {
+      .date {
+        color: #fff;
+        background-color: @green-4;
+
+      }
+    }
+
+    &.s-4 {
+      .date {
+        color: #fff;
+        background-color: @green-5;
+
+      }
+    }
+
+    &.s-5 {
+      .date {
+        color: #fff;
+        background-color: @green-6;
+      }
+    }
+  }
+
+  &.fail {
+    &.f-1 {
+      .date {
+        color: #fff;
+        background-color: @red-2;
+
+      }
+    }
+
+    &.f-2 {
+      .date {
+        color: #fff;
+        background-color: @red-3;
+
+      }
+    }
+
+    &.f-3 {
+      .date {
+        color: #fff;
+        background-color: @red-4;
+
+      }
+    }
+
+    &.f-4 {
+      .date {
+        color: #fff;
+        background-color: @red-5;
+
+      }
+    }
+
+    &.f-5 {
+      .date {
+        color: #fff;
+        background-color: @red-6;
+      }
+    }
+  }
+
+
+  .date {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    transition: all ease-in-out 0.2s 0s;
+    border-radius: 3px;
+
+
+  }
+
+  .info {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    transition: all ease-in-out 0.2s 0s;
+    position: absolute;
+    opacity: 0;
+
+    background-color: #1890ff;
+    color: #fff;
+    border-radius: 3px;
+  }
+
+  .goals {
+    position: absolute;
+    margin-right: -20px;
+    font-size: 8px;
+    width: 10px;
+    height: 10px;
+    line-height: 10px;
+    background-color: #993333;
+    color: #ffffff;
+    border-radius: 5px;
+    text-align: center;
+
   }
 }
