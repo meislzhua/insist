@@ -23,6 +23,11 @@ class InsistTray {
 
           {label: '设置(尚未开发)'},
           {
+            label: '开发者', click() {
+              share.window.win.webContents.openDevTools({mode: "detach"})
+            }
+          },
+          {
             label: '显示/隐藏', click() {
               if (!share.window) return;
               share.window.showOrHide();

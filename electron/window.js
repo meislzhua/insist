@@ -18,7 +18,6 @@ class InsistWindow {
         show: false
       });
       await this.win.loadURL(this.share.config.url);
-      if (this.share.config.env === "dev") this.win.webContents.openDevTools({mode: "detach"})
     })
   }
 
