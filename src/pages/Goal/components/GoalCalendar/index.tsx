@@ -67,12 +67,12 @@ export default class GoalCalendar extends React.Component<GoalCalendarProps, Goa
     if (this.state.selectedDate.isSame(date, "day")) classNames.push(styles.active);
     if (data.success) {
       classNames.push(styles.success);
-      if (data.success >= 5) classNames.push("s-5")
+      if (data.success >= 5) classNames.push(styles["s-5"])
       else classNames.push(styles[`s-${data.success}`])
     }
     if (data.fail) {
       classNames.push(styles.fail);
-      if (data.fail >= 5) classNames.push("f-5")
+      if (data.fail >= 5) classNames.push(styles[`f-5`])
       else classNames.push(styles[`f-${data.fail}`])
     }
     return (
