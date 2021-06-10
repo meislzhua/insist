@@ -1,9 +1,17 @@
-import moment from "moment";
-import {Goal} from "@/services/Dao/struct/goal/Goal";
-import {GoalHistory} from "@/services/Dao/struct/goal/GoalHistory";
+import moment from 'moment';
+import { Goal } from '@/services/Dao/struct/goal/Goal';
+import { GoalHistory } from '@/services/Dao/struct/goal/GoalHistory';
 
 export class GoalLogic {
-  static getShowGoalInDay({goals, date, historyIndex}: { goals: Goal[], date: moment.Moment, historyIndex: any }) {
+  static getShowGoalInDay({
+    goals,
+    date,
+    historyIndex,
+  }: {
+    goals: Goal[];
+    date: moment.Moment;
+    historyIndex: any;
+  }) {
     if (moment().startOf('day').isAfter(date, 'day')) return [];
     return goals.reduce((p: Goal[], goal: Goal) => {
       let isVisible = false;
@@ -13,7 +21,9 @@ export class GoalLogic {
       let endTime = moment();
       switch (goal.repetition) {
         case 'once':
-          isVisible = date.isSame(goal.appointDate || moment(), 'day');
+          isVisible = date.isSame(moment(), 'day');
+          if (isVisible && goal.appointDate)
+            isVisible = date.isSameOrAfter(goal.appointDate, 'day');
           break;
         case 'day':
         case 'week':
@@ -31,7 +41,7 @@ export class GoalLogic {
             endTime = date.clone().endOf('month');
           }
           while (startTime.isSameOrBefore(endTime, 'day')) {
-            count += (historyIndex[this.getDateKey({date: startTime})] || []).filter(
+            count += (historyIndex[this.getDateKey({ date: startTime })] || []).filter(
               (history: GoalHistory) => history.goal.objectId === goal.objectId,
             ).length;
             startTime.add(1, 'day');
@@ -43,9 +53,10 @@ export class GoalLogic {
         case 'appoint_month':
           // 处理指定每周几 或 每月N号的情况
           // eslint-disable-next-line no-case-declarations
-          const targetAppoint = goal.repetition === 'appoint_month' ? date.date() : date.isoWeekday();
+          const targetAppoint =
+            goal.repetition === 'appoint_month' ? date.date() : date.isoWeekday();
           if (targetAppoint === goal.appoint) {
-            count = (historyIndex[this.getDateKey({date})] || []).filter(
+            count = (historyIndex[this.getDateKey({ date })] || []).filter(
               (history: GoalHistory) => history.goal.objectId === goal.objectId,
             ).length;
             isVisible = !count;
@@ -60,8 +71,7 @@ export class GoalLogic {
     }, []);
   }
 
-  static getDateKey({date}: { date: moment.Moment }) {
+  static getDateKey({ date }: { date: moment.Moment }) {
     return date.format('YYYY-MM-DD');
   }
-
 }
