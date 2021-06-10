@@ -39,17 +39,17 @@ export async function deleteGoal({goal}: { goal: Goal }) {
   await db_option.destroy();
 }
 
-export async function finishGoal({goal, isSuccess, content}: { goal: Goal, isSuccess: boolean, content?: string }) {
+export async function finishGoal({goal, isSuccess, content, appointDate}: { goal: Goal, isSuccess: boolean, content?: string, appointDate?: Date }) {
   const db_item = AV.Object.createWithoutData('Goal', goal.objectId);
   const edit = {...goal};
   ["owner", "updatedAt", "createdAt", "objectId"].map(key => delete edit[key])
   if (goal.repetition === "once") db_item.set("isFinish", true)
-  db_item.set("lastFinishDate", new Date())
+  db_item.set("lastFinishDate", appointDate || new Date())
   db_item.increment('finishCount', 1);
   await db_item.save()
 
   const db_history = new AV.Object("GoalHistory")
-  db_history.set("date", moment().startOf("day").toDate())
+  db_history.set("date", moment(appointDate || new Date()).startOf("day").toDate())
   db_history.set("goal", db_item)
   db_history.set("title", goal.title)
   db_history.set("isSuccess", isSuccess)

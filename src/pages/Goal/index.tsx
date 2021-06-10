@@ -173,8 +173,14 @@ export default class GoalPage extends React.Component {
       maskClosable: true,
       centered: true,
       onOk: async () => {
+        const appointDate = goal.repetition === "once" && goal.appointDate && moment(goal.appointDate).startOf("day").toDate();
         await Dao.goal
-          .finishGoal({goal, isSuccess, content})
+          .finishGoal({
+            goal,
+            isSuccess,
+            content,
+            appointDate: appointDate || undefined
+          })
           .then(() => this.setState({goals: this.state.goals.filter((f: any) => f !== goal)}))
           .catch((err) => message.error(`操作失败: ${err.message}`));
 
