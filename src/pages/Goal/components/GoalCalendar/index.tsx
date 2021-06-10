@@ -54,7 +54,6 @@ export default class GoalCalendar extends React.Component<GoalCalendarProps, Goa
   }
 
   getCellData({date}: { date: moment.Moment }): { success: number, fail: number, goals: number, } {
-    console.log("目标数据", this.props.calendarData)
     return this.props.calendarData[GoalLogic.getDateKey({date})] || {
       success: 0,
       fail: 0,
