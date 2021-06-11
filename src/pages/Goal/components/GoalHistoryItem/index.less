@@ -1,0 +1,49 @@
+@import '~antd/es/style/themes/default.less';
+
+
+.GoalHistoryItem {
+  font-size: 18px;
+  margin: 10px 0;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  transition: all 150ms ease-in-out 0s;
+
+  &.success {
+    background-color: @green-8;
+    box-shadow: 0 0 5px 0 @green-8;
+
+  }
+
+  &.fail {
+    background-color: @red-8;
+    box-shadow: 0 0 5px 0 @red-8;
+  }
+
+  @media (any-hover: hover) {
+    &:hover {
+      &.success {
+        background-color: @green-9;
+        box-shadow: 0 0 10px 0 @green-9;
+
+      }
+
+      &.fail {
+        background-color: @red-9;
+        box-shadow: 0 0 10px 0 @red-9;
+      }
+    }
+  }
+
+  .title {
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .icon {
+    font-size: 20px;
+    padding: 10px;
+  }
+
+}
+

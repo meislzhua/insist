@@ -1,0 +1,69 @@
+@import '~antd/es/style/themes/default.less';
+
+.GoalItemBox {
+
+  flex-grow: 1;
+  overflow: auto;
+  padding: 5px 10px 10px 10px;
+}
+
+.active() {
+  box-shadow: 0 0 8px 0 #aaaaaa;
+
+  .GoalItemOperation {
+    height: 40px;
+  }
+}
+
+.GoalItem {
+
+  padding: 5px 10px;
+  //border: 1px solid #aaaaaa;
+  margin-bottom: 10px;
+  outline: none;
+  box-shadow: 0 0 8px -3px #aaaaaa;
+  border-radius: 3px;
+  transition: height 0.3s;
+  cursor: pointer;
+
+  .GoalItemTitle {
+    font-size: 20px;
+  }
+
+  .GoalItemContent {
+    font-size: 16px;
+  }
+
+  .GoalItemInfo {
+    border-top: 1px solid #eeeeee;
+    margin-top: 5px;
+    padding: 5px 0;
+
+    .GoalItemInfoRepetition {
+      color: @primary-3;
+    }
+  }
+
+  .GoalItemOperation {
+    height: 0;
+    overflow: hidden;
+    transition: all 300ms ease-in-out 0s;
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    color: #bbbbbb;
+
+    & > * {
+      flex-grow: 1;
+    }
+
+    :not(:first-child) {
+      border-left: 1px solid #dddddd;
+    }
+  }
+
+
+  &.active {
+    .active();
+  }
+}
