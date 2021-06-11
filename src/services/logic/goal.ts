@@ -24,6 +24,7 @@ export class GoalLogic {
           isVisible = date.isSame(moment(), 'day');
           if (isVisible && goal.appointDate)
             isVisible = date.isSameOrAfter(goal.appointDate, 'day');
+          isVisible = isVisible || date.isSame(goal.appointDate, 'day');
           break;
         case 'day':
         case 'week':
