@@ -1,5 +1,13 @@
 @import '~antd/es/style/themes/default.less';
 
+:global(.ant-picker-cell) {
+  padding: 3px;
+}
+
+:global(.ant-picker-content) {
+  height: auto !important;
+}
+
 @dateWith: 24px;
 .calendar {
   box-shadow: 0 0 5px -2px #aaa;
@@ -56,6 +64,7 @@
     line-height: @dateWith - 4px;
   }
 }
+
 .dateCell {
   transition: all ease-in-out 0.3s 0s;
   z-index: 2;
