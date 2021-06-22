@@ -2,6 +2,7 @@ import AV from "@/services/Leancloud";
 import moment from "moment";
 import {Goal} from "@/services/Dao/struct/goal/Goal";
 import {GoalHistory} from "@/services/Dao/struct/goal/GoalHistory";
+import {GoalTag} from "@/services/Dao/struct/goal/GoalTag";
 
 export async function listGoals({isFinish = false}: { isFinish?: boolean } = {}): Promise<Goal[]> {
   const query = new AV.Query("Goal")
@@ -58,4 +59,34 @@ export async function finishGoal({goal, isSuccess, content, appointDate}: { goal
   await db_history.save()
 
   return db_history.toJSON()
+}
+
+
+export async function addGoalTag({tag}: { tag: GoalTag }) {
+  if (!tag) throw new Error("增加goal不可为空");
+  const db_tag = new AV.Object("GoalTag")
+  db_tag.set(tag)
+  db_tag.set("owner", AV.User.current())
+  await db_tag.save()
+  return db_tag.toJSON()
+}
+
+export async function deleteGoalTag({tag}: { tag: GoalTag }) {
+  const db_option = AV.Object.createWithoutData('GoalTag', tag.objectId);
+  await db_option.destroy();
+}
+
+export async function listGoalTag(): Promise<GoalTag[]> {
+  const query = new AV.Query("GoalTag")
+  return (await query.find()).map((i: any) => i.toJSON())
+}
+
+export async function editGoalTag({tag, id}: { tag: GoalTag, id: any }) {
+  if (!tag || !id) throw new Error("增加tag不可为空");
+  const {colorName, name} = tag;
+  const db_tag = AV.Object.createWithoutData('GoalTag', id);
+  db_tag.set({colorName, name})
+  db_tag.set("owner", AV.User.current())
+  await db_tag.save()
+  return db_tag.toJSON()
 }

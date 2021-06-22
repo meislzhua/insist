@@ -9,24 +9,25 @@ interface GoalAddBoxProps {
 
 }
 
-export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
+export default class GoalHistoryItem extends React.Component<GoalAddBoxProps> {
 
   state: any = {}
 
   render() {
     const {history} = this.props;
     const classNames = [styles.GoalHistoryItem];
-    const tag = [<div className={styles.title}>{history.title}</div>];
     if (history.isSuccess) {
       classNames.push(styles.success)
-      tag.unshift(<CheckCircleOutlined className={styles.icon}/>)
     } else {
-      tag.unshift(<CloseCircleOutlined  className={styles.icon} />)
       classNames.push(styles.fail)
     }
     return (
       <div className={classNames.join(" ")}>
-        {tag}
+        {history.isSuccess ?
+          <CheckCircleOutlined className={styles.icon}/> :
+          <CloseCircleOutlined className={styles.icon}/>
+        }
+        <div className={styles.title}>{history.title}</div>
       </div>
     )
   }

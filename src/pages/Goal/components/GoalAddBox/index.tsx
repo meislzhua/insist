@@ -1,9 +1,13 @@
 import React from 'react';
 import styles from './index.less';
-import {Button, Drawer, Form, FormInstance, Input, message, Select, DatePicker} from "antd";
+import type {FormInstance} from "antd";
+import {Button, Drawer, Form, Input, message, Select, DatePicker, Tag} from "antd";
 import * as Dao from "@/services/Dao";
 import moment from "moment";
-import {Goal} from "@/services/Dao/struct/goal/Goal";
+import type {Goal} from "@/services/Dao/struct/goal/Goal";
+import {PlusOutlined} from "@ant-design/icons/lib";
+import GoalTagItem from "@/pages/Goal/components/GoalTagItem";
+import type {GoalTag} from '@/services/Dao/struct/goal/GoalTag';
 
 interface GoalAddBoxProps {
   onSubmit?: (goal: Goal) => void;
@@ -11,11 +15,19 @@ interface GoalAddBoxProps {
 
 export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
   addGoalFrom = React.createRef<FormInstance>();
+  addTagInput = React.createRef<Input>();
 
   state: any = {
     day: null,
     isGoalAddShow: false,
-    form: {}
+    form: {},
+    isAddTag: false,
+    newTag: "",
+    tags: []
+  }
+
+  componentDidMount() {
+    this.refreshTags();
   }
 
   get isNumberRepetition() {
@@ -35,17 +47,43 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
     const isGoalAddShow = force ?? !this.state.isGoalAddShow
     this.setState({isGoalAddShow}, () => {
       // 设置弹出添加框
+      const nowTags = (editGoal?.tags || []).map((tag: GoalTag) => tag.name);
       if (isGoalAddShow) {
+        // eslint-disable-next-line no-param-reassign
+        this.state.tags.forEach((tag: GoalTag) => tag.isActive = nowTags.includes(tag.name))
+        this.setState({tags: this.state.tags});
+
         if (editGoal) {
           const data: any = {...editGoal};
           if (data.appointDate) data.appointDate = moment(data.appointDate)
           this.addGoalFrom.current?.setFieldsValue(data)
-        } else this.addGoalFrom.current?.resetFields();
+        } else {
+          this.addGoalFrom.current?.resetFields();
+        }
+
         if (moment().isBefore(day, "day")) this.addGoalFrom.current?.setFieldsValue({appointDate: day?.clone()})
         this.setState({editGoal, day, form: this.addGoalFrom.current?.getFieldsValue()})
         setTimeout(() => this.addGoalFrom.current?.getFieldInstance("title")?.focus(), 0)
       }
     })
+  }
+
+  async refreshTags() {
+    this.setState({tags: await Dao.goal.listGoalTag()})
+  }
+
+  async event_addTag() {
+    this.setState({newTag: "", isAddTag: true}, () => this.addTagInput?.current?.focus());
+  }
+
+  async event_submitAddTag() {
+    const {tags, newTag} = this.state;
+    if (tags.find((tag: GoalTag) => tag.name === newTag)) return message.error(`已存在相同的tag: ${newTag}`);
+    const tag: any = {name: this.addTagInput?.current?.input.value || ""};
+    return Dao.goal.addGoalTag({tag})
+      .then(newTags => this.setState({tags: [...tags, newTags]}))
+      .then(() => message.success("成功添加"))
+      .catch(err => message.error(`添加失败: ${err.message}`))
   }
 
   async submit() {
@@ -62,6 +100,7 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
     // 提交增加目标
     try {
       const data = this.addGoalFrom.current?.getFieldsValue();
+      data.tags = this.state.tags.map((tag: GoalTag) => tag.isActive && tag).filter((name: GoalTag) => !!name)
       if (data.appointDate) data.appointDate = data.appointDate.startOf("day").toDate();
       if (data.repetitionCount) data.repetitionCount *= 1;
 
@@ -77,13 +116,14 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
   }
 
   render() {
+    const {isAddTag, tags} = this.state;
     return (
       <Drawer
         placement="bottom" closable={false}
         onClose={() => this.toggleAddGoalShow()}
         visible={this.state.isGoalAddShow}
         bodyStyle={{padding: "5px"}}
-        // height={"50%"}
+        height={"330px"}
         className={styles.addBox}
         footer={
           <Button block
@@ -145,6 +185,27 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
               message: '连目标都没有,这样和咸鱼有什么区别!',
             },
           ]}><Input placeholder="你的目标是?"/></Form.Item>
+          <Form.Item label="Tag">
+            {tags.map((tag: GoalTag) => <GoalTagItem key={tag.name} tag={tag}/>)}
+            {isAddTag && (
+              <Input
+                ref={this.addTagInput}
+                type="text"
+                size="small"
+                style={{width: 78}}
+                onChange={e => this.setState({newTag: e.target.value})}
+                onBlur={() => this.setState({newTag: "", isAddTag: false})}
+                onPressEnter={() => this.event_submitAddTag()}
+                onKeyPress={event => event.stopPropagation()}
+              />
+            )}
+            {!isAddTag && (
+
+              <Tag onClick={() => this.event_addTag()} className={styles.addTag}><PlusOutlined/></Tag>
+            )}
+          </Form.Item>
+
+
         </Form>
       </Drawer>
     )

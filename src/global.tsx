@@ -1,7 +1,6 @@
 import {Button, message, notification} from 'antd';
 import * as EventEmitter from 'events';
 
-import React from 'react';
 import {useIntl, history} from 'umi';
 import defaultSettings from '../config/defaultSettings';
 
@@ -63,7 +62,7 @@ if (pwa) {
   });
 
   // 尝试注册sw
-  navigator.serviceWorker.register('/sw.js')
+  navigator?.serviceWorker?.register?.('/sw.js')
     .then(function (registration) {
       console.log('Registered events at scope: ', registration.scope);
     });
@@ -82,7 +81,7 @@ if (pwa) {
   });
 
   // remove all caches
-  if (window.caches && window.caches.keys) {
+  if (window.caches && window.caches.keys()) {
     caches.keys().then((keys) => {
       keys.forEach((key) => {
         caches.delete(key);

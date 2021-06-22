@@ -1,4 +1,5 @@
 import {AVObject} from "@/services/Dao/struct/AVObject";
+import {GoalTag} from "@/services/Dao/struct/goal/GoalTag";
 
 export interface Goal extends AVObject {
   title: string
@@ -8,7 +9,8 @@ export interface Goal extends AVObject {
   repetition: "once" | "day" | "week" | "month" | "appoint_week" | "appoint_month"
   repetitionCount: number
   appoint?: number
-  appointDate?: Date
+  appointDate?: Date,
+  tags: GoalTag[]
 }
 
 

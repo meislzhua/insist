@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './index.less';
-import { message, Modal, Tag} from "antd";
+import {message, Modal, Tag} from "antd";
 import * as Dao from "@/services/Dao";
 import moment from "moment";
 import {
@@ -12,6 +12,7 @@ import {
 
 import type {Goal} from "@/services/Dao/struct/goal/Goal";
 import {CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined} from "@ant-design/icons/lib";
+import GoalTagItem from "@/pages/Goal/components/GoalTagItem";
 
 interface GoalAddBoxProps {
   goal: Goal;
@@ -19,7 +20,7 @@ interface GoalAddBoxProps {
   onEdit?: (goal: Goal) => void;
 }
 
-export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
+export default class GoalItem extends React.Component<GoalAddBoxProps> {
 
   state: any = {
     isActive: false
@@ -87,6 +88,9 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
     else if (goal.repetition === "month") infos.push(<Tag color="#7cb305">每月{goal.repetitionCount}次</Tag>)
     else if (goal.repetition === "appoint_week") infos.push(<Tag color="#9e1068">每周{goal.appoint}</Tag>)
     else if (goal.repetition === "appoint_month") infos.push(<Tag color="#391085">每月{goal.appoint}号</Tag>)
+
+    goal.tags.forEach(tag => infos.push(<GoalTagItem tag={tag} showModel={true}/>))
+
     return (
       <div key={goal.objectId} className={[styles.GoalItem, this.state.isActive ? styles.active : ""].join(" ")}
            onClick={() => this.setState({isActive: !this.state.isActive})}>
