@@ -27,7 +27,7 @@ export default class GoalHistoryItem extends React.Component<GoalAddBoxProps> {
           <CheckCircleOutlined className={styles.icon}/> :
           <CloseCircleOutlined className={styles.icon}/>
         }
-        <div className={styles.title}>{history.title}</div>
+        <div className={styles.title}>{history.goalSnapshoot.title}</div>
       </div>
     )
   }

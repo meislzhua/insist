@@ -48,16 +48,16 @@ export async function finishGoal({goal, isSuccess, content, appointDate}: { goal
   db_item.set("lastFinishDate", appointDate || new Date())
   db_item.increment('finishCount', 1);
   await db_item.save()
+  await db_item.fetch()
 
   const db_history = new AV.Object("GoalHistory")
   db_history.set("date", moment(appointDate || new Date()).startOf("day").toDate())
-  db_history.set("goal", db_item)
-  db_history.set("title", goal.title)
+  db_history.set("goalSnapshoot", db_item.toJSON())
   db_history.set("isSuccess", isSuccess)
   db_history.set("owner", AV.User.current())
   if (content) db_history.set("content", content)
   await db_history.save()
-
+  if(db_item.toJSON().isFinish) await db_item.destroy()
   return db_history.toJSON()
 }
 
