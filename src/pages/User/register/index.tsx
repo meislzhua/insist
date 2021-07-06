@@ -3,8 +3,8 @@ import ProForm, {ProFormText} from "@ant-design/pro-form";
 import styles from "@/pages/User/register/index.less";
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {getIntl, FormattedMessage, history} from 'umi';
-import AV from '@/services/Leancloud';
 import {message} from "antd";
+import {Dao} from "@/services/Dao";
 
 export default class Register extends React.Component {
   state = {
@@ -14,11 +14,8 @@ export default class Register extends React.Component {
 
   async register({username, password}: { username: string, password: string }) {
     this.setState({isLoading: true});
-    const user = new AV.User();
-    user.setUsername(username);
-    user.setPassword(password);
     try {
-      await user.signUp()
+      await Dao.user.register({username, password})
       message.success('注册成功', 2.5)
       history.push("/user/login")
     } catch (e) {

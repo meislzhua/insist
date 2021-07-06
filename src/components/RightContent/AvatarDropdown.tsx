@@ -6,7 +6,7 @@ import {history, useModel} from 'umi';
 import {stringify} from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import AV from '@/services/Leancloud';
+import {Dao} from "@/services/Dao";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -16,7 +16,7 @@ export type GlobalHeaderRightProps = {
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await AV.User.logOut();
+  await Dao.user.logout();
   const {query = {}, pathname} = history.location;
   const {redirect} = query;
   // Note: There may be security issues, please note

@@ -1,4 +1,3 @@
-import React from 'react';
 import type {Settings as LayoutSettings} from '@ant-design/pro-layout';
 import {PageLoading} from '@ant-design/pro-layout';
 import {notification} from 'antd';
@@ -8,7 +7,7 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type {ResponseError} from 'umi-request';
 import {BookOutlined, LinkOutlined} from '@ant-design/icons';
-import AV from "@/services/Leancloud"
+import {Dao} from "@/services/Dao";
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -27,7 +26,7 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const currentUser = AV.User.current()
+      const currentUser = await Dao.user.current()
       if (!currentUser) throw new Error("不存在当前用户");
 
       console.log("我的当前用户");

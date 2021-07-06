@@ -2,12 +2,12 @@ import React from 'react';
 import styles from './index.less';
 import type {FormInstance} from "antd";
 import {Button, Drawer, Form, Input, message, Select, DatePicker, Tag} from "antd";
-import * as Dao from "@/services/Dao";
 import moment from "moment";
 import type {Goal} from "@/services/Dao/struct/goal/Goal";
 import {PlusOutlined} from "@ant-design/icons/lib";
 import GoalTagItem from "@/pages/Goal/components/GoalTagItem";
 import type {GoalTag} from '@/services/Dao/struct/goal/GoalTag';
+import {Dao} from "@/services/Dao";
 
 interface GoalAddBoxProps {
   onSubmit?: (goal: Goal) => void;

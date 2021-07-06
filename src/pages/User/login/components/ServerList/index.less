@@ -1,0 +1,26 @@
+.serverList {
+  width: 100%;
+  text-align: center;
+}
+
+.serverItem {
+  @size: 30px;
+  width: @size;
+  height: @size;
+  object-fit: cover;
+  border-radius: 50%;
+  filter: grayscale(1);
+  opacity: 0.5;
+
+  &.active {
+    filter: grayscale(0);
+    opacity: 1;
+
+  }
+}
+
+.serverBoxTitle {
+  user-select: none;
+  color: @primary-color;
+  cursor: pointer;
+}

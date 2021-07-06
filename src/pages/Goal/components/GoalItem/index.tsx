@@ -2,7 +2,7 @@ import React from 'react';
 import { promisify } from 'util';
 import styles from './index.less';
 import { message, Modal, Tag, DatePicker } from 'antd';
-import * as Dao from '@/services/Dao';
+import {Dao} from '@/services/Dao';
 import moment from 'moment';
 import {
   CheckSquareOutlined,

@@ -1,13 +1,13 @@
 import React from 'react';
 import {Button} from "antd";
-import AV from "@/services/Leancloud";
 import {history} from "@@/core/history";
 import {stringify} from "querystring";
+import {Dao} from "@/services/Dao";
 
 export default class UserInfo extends React.Component {
 
   async loginOut() {
-    await AV.User.logOut();
+    await Dao.user.logout();
     const {query = {}, pathname} = history.location;
     const {redirect} = query;
     // Note: There may be security issues, please note

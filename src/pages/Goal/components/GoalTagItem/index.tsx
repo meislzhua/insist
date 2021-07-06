@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './index.less';
 import {message, Select, Tag} from "antd";
-import * as Dao from "@/services/Dao";
+import {Dao} from "@/services/Dao";
 import type {GoalTag} from "@/services/Dao/struct/goal/GoalTag";
 
 

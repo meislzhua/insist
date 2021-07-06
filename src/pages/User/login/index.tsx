@@ -1,15 +1,14 @@
-import {
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import {LockOutlined, UserOutlined,} from '@ant-design/icons';
 import {Alert, message} from 'antd';
 import React, {useState} from 'react';
 import ProForm, {ProFormCheckbox, ProFormText} from '@ant-design/pro-form';
+
 // @ts-ignore
-import {useIntl, Link, history, FormattedMessage, useModel} from 'umi';
-import AV from '@/services/Leancloud';
+import {FormattedMessage, history, Link, useIntl, useModel} from 'umi';
 
 import styles from './index.less';
+import ServerList from "@/pages/User/login/components/ServerList";
+import {Dao} from "@/services/Dao";
 
 const LoginMessage: React.FC<{
   content: string;
@@ -23,6 +22,7 @@ const LoginMessage: React.FC<{
     showIcon
   />
 );
+
 
 /** 此方法会跳转到 redirect 参数所在的位置 */
 const goto = () => {
@@ -58,9 +58,13 @@ const Login: React.FC = () => {
       // 登录
       const msg: API.LoginResult = {type: "account"};
       try {
-        const user = await AV.User.logIn(values.username as string, values.password as string)
+        if (values.username && values.password) await Dao.user.login({
+          username: values.username as string,
+          password: values.password as string
+        })
+        else throw new Error("请输出用户名和密码");
+
         msg.status = "ok"
-        console.log(user)
       } catch (e) {
         msg.status = "error"
       }
@@ -80,6 +84,7 @@ const Login: React.FC = () => {
     setSubmitting(false);
   };
   const {status, type: loginType} = userLoginState;
+
 
   return (
     <div className={styles.container}>
@@ -186,6 +191,8 @@ const Login: React.FC = () => {
               </Link>
             </div>
           </ProForm>
+          <ServerList/>
+
         </div>
       </div>
     </div>

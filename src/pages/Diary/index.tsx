@@ -17,7 +17,6 @@ import {
   Modal,
   Radio
 } from "antd";
-import * as Dao from "@/services/Dao/index";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import {
   CoffeeOutlined, DislikeOutlined,
@@ -30,6 +29,7 @@ import {
 import config from "@/config";
 import {DiaryItem} from "@/services/Dao/struct/diary/DiaryItem";
 import {DiaryOption} from "@/services/Dao/struct/diary/DiaryOption";
+import {Dao} from "@/services/Dao";
 
 const InternalOption: any = {
   mood: {

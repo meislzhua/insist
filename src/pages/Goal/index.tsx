@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './index.less';
 import type {FormInstance} from 'antd';
 import {Button} from 'antd';
-import * as Dao from '@/services/Dao/index';
+import {Dao} from '@/services/Dao';
 
 import {PlusOutlined,} from '@ant-design/icons';
 
@@ -93,6 +93,7 @@ export default class GoalPage extends React.Component {
   async refreshGoals() {
     const goals = await Dao.goal.listGoals();
     this.setState({goals});
+
   }
 
 
