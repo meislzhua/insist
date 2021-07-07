@@ -2,7 +2,7 @@ import React from 'react';
 import { promisify } from 'util';
 import styles from './index.less';
 import { message, Modal, Tag, DatePicker } from 'antd';
-import {Dao} from '@/services/Dao';
+import { Dao } from '@/services/Dao';
 import moment from 'moment';
 import {
   CheckSquareOutlined,
@@ -109,7 +109,8 @@ export default class GoalItem extends React.Component<GoalAddBoxProps> {
       infos.push(<Tag color="#2db7f5">单次</Tag>);
       if (goal.appointDate) {
         const date = `目标日期: ${moment(goal.appointDate).startOf('day').format('YYYY-MM-DD')}`;
-        if (moment().isAfter(goal.appointDate)) infos.push(<Tag color="red">{date}</Tag>);
+        if (moment().startOf('day').isAfter(goal.appointDate))
+          infos.push(<Tag color="red">{date}</Tag>);
         else infos.push(<Tag color="green">{date}</Tag>);
       }
     } else if (goal.repetition === 'day')
