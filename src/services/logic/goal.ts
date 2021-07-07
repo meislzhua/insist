@@ -43,7 +43,7 @@ export class GoalLogic {
           }
           while (startTime.isSameOrBefore(endTime, 'day')) {
             count += (historyIndex[this.getDateKey({ date: startTime })] || []).filter(
-              (history: GoalHistory) => history.goal.objectId === goal.objectId,
+              (history: GoalHistory) => history.goalSnapshoot.objectId === goal.objectId,
             ).length;
             startTime.add(1, 'day');
           }
@@ -58,7 +58,7 @@ export class GoalLogic {
             goal.repetition === 'appoint_month' ? date.date() : date.isoWeekday();
           if (targetAppoint === goal.appoint) {
             count = (historyIndex[this.getDateKey({ date })] || []).filter(
-              (history: GoalHistory) => history.goal.objectId === goal.objectId,
+              (history: GoalHistory) => history.goalSnapshoot.objectId === goal.objectId,
             ).length;
             isVisible = !count;
           }
