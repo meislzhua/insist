@@ -64,6 +64,7 @@ export default class GoalItem extends React.Component<GoalAddBoxProps> {
   }) {
     const appointDate =
       goal.repetition === 'once' && goal.appointDate && moment(goal.appointDate).startOf('day');
+    // @ts-ignore
     await promisify(this.setState).bind(this)({ finishDate: appointDate || moment() });
     return Modal.confirm({
       title: isSuccess ? '已经完成了吗' : '失败了吗',
@@ -114,7 +115,7 @@ export default class GoalItem extends React.Component<GoalAddBoxProps> {
         else infos.push(<Tag color="green">{date}</Tag>);
       }
     } else if (goal.repetition === 'day')
-      infos.push(<Tag color="#d48806">每日{goal.repetitionCount}次</Tag>);
+      infos.push(<Tag color="#2f54eb">每日{goal.repetitionCount}次</Tag>);
     else if (goal.repetition === 'week')
       infos.push(<Tag color="#08979c">每周{goal.repetitionCount}次</Tag>);
     else if (goal.repetition === 'month')
