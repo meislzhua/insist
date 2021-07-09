@@ -1,18 +1,19 @@
 import React from 'react';
 import styles from './index.less';
-import type {FormInstance} from 'antd';
-import {Button} from 'antd';
-import {Dao} from '@/services/Dao';
+import type { FormInstance } from 'antd';
+import { Button } from 'antd';
+import { Dao } from '@/services/Dao';
 
-import {PlusOutlined,} from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 
 import moment from 'moment';
 import GoalAddBox from '@/pages/Goal/components/GoalAddBox';
 import GoalCalendar from '@/pages/Goal/components/GoalCalendar';
 import GoalHistoryItem from '@/pages/Goal/components/GoalHistoryItem';
 import GoalItem from '@/pages/Goal/components/GoalItem';
-import {GoalLogic} from "@/services/logic/goal";
-import {GoalHistory} from "@/services/Dao/struct/goal/GoalHistory";
+import { GoalLogic } from '@/services/logic/goal';
+import { GoalHistory } from '@/services/Dao/struct/goal/GoalHistory';
+import { Goal, GoalPriority } from '@/services/Dao/struct/goal/Goal';
 
 export default class GoalPage extends React.Component {
   addGoalFrom = React.createRef<FormInstance>();
@@ -54,89 +55,100 @@ export default class GoalPage extends React.Component {
     return GoalLogic.getShowGoalInDay({
       goals: this.state.goals,
       historyIndex: this.state.historyIndex,
-      date: this.state.selectedDate
-    })
+      date: this.state.selectedDate,
+    });
   }
 
   get showGoalHistory() {
-    return this.state.historyIndex[GoalLogic.getDateKey({date: this.state.selectedDate})] || [];
+    return this.state.historyIndex[GoalLogic.getDateKey({ date: this.state.selectedDate })] || [];
   }
 
   async updateCacheDate() {
-    return new Promise<void>(resolve => this.setState({
-      cacheGoalStart: this.state.selectedDate.clone().startOf('month').subtract(this.cacheMonth, 'month'),
-      cacheGoalEnd: this.state.selectedDate.clone().startOf('month').add(this.cacheMonth, 'month'),
-    }, () => resolve()))
+    return new Promise<void>((resolve) =>
+      this.setState(
+        {
+          cacheGoalStart: this.state.selectedDate
+            .clone()
+            .startOf('month')
+            .subtract(this.cacheMonth, 'month'),
+          cacheGoalEnd: this.state.selectedDate
+            .clone()
+            .startOf('month')
+            .add(this.cacheMonth, 'month'),
+        },
+        () => resolve(),
+      ),
+    );
+  }
+
+  getShowNumberInCalendar({ date }: { date: moment.Moment }): number {
+    const { goals, historyIndex } = this.state;
+    let showGoals = GoalLogic.getShowGoalInDay({ goals, historyIndex, date });
+    // 过滤优先级为不重要的目标
+    showGoals = showGoals.filter((goal: Goal) => goal.priority !== GoalPriority.Optional);
+    return showGoals.length;
   }
 
   async updateCalendarData() {
-    const data = {};
+    const calendarData = {};
     const date = this.state.cacheGoalStart.clone();
     while (this.state.cacheGoalEnd.isAfter(date)) {
-      data[GoalLogic.getDateKey({date})] = {
-        goals: GoalLogic.getShowGoalInDay({
-          goals: this.state.goals,
-          historyIndex: this.state.historyIndex,
-          date
-        }).length,
-        success: (this.state.historyIndex[GoalLogic.getDateKey({date})] || [])
-          .filter((history: GoalHistory) => history.isSuccess).length,
-        fail: (this.state.historyIndex[GoalLogic.getDateKey({date})] || [])
-          .filter((history: GoalHistory) => !history.isSuccess).length
-      }
-      date.add(1, "day")
+      calendarData[GoalLogic.getDateKey({ date })] = {
+        goals: this.getShowNumberInCalendar({ date }),
+        success: (this.state.historyIndex[GoalLogic.getDateKey({ date })] || []).filter(
+          (history: GoalHistory) => history.isSuccess,
+        ).length,
+        fail: (this.state.historyIndex[GoalLogic.getDateKey({ date })] || []).filter(
+          (history: GoalHistory) => !history.isSuccess,
+        ).length,
+      };
+      date.add(1, 'day');
     }
-    this.setState({calendarData: data})
-    return data
+    this.setState({ calendarData });
+    return calendarData;
   }
 
   async refreshGoals() {
     const goals = await Dao.goal.listGoals();
-    this.setState({goals});
-
+    this.setState({ goals });
   }
-
 
   async refreshGoalHistory() {
     const historyList = await Dao.goal.listGoalsHistory({
       startTime: this.state.cacheGoalStart.toDate(),
-      endTime: this.state.cacheGoalEnd.toDate()
-    })
+      endTime: this.state.cacheGoalEnd.toDate(),
+    });
     const historyIndex = historyList.reduce((p: any, v) => {
-        // 按照日期建立数组
-        const key = GoalLogic.getDateKey({date: moment(v.date)});
-        // eslint-disable-next-line no-param-reassign
-        (p[key] = p[key] || []).push(v);
-        return p;
-      },
-      {},
-    );
-    this.setState({historyIndex});
+      // 按照日期建立数组
+      const key = GoalLogic.getDateKey({ date: moment(v.date) });
+      // eslint-disable-next-line no-param-reassign
+      (p[key] = p[key] || []).push(v);
+      return p;
+    }, {});
+    this.setState({ historyIndex });
   }
 
   async refreshAll() {
-    await this.updateCacheDate()
+    await this.updateCacheDate();
     await Promise.all([this.refreshGoalHistory(), this.refreshGoals()]);
-    await this.updateCalendarData()
+    await this.updateCalendarData();
   }
 
-
-  event_selectDay({date}: { date: moment.Moment; last: moment.Moment }) {
-    let isUpdate = this.state.cacheGoalStart.isAfter(date.clone().subtract(1, "month"))
-    isUpdate = isUpdate || this.state.cacheGoalEnd.isBefore(date.clone().add(1, "month"))
-    this.setState({selectedDate: date}, async () => {
+  event_selectDay({ date }: { date: moment.Moment; last: moment.Moment }) {
+    let isUpdate = this.state.cacheGoalStart.isAfter(date.clone().subtract(1, 'month'));
+    isUpdate = isUpdate || this.state.cacheGoalEnd.isBefore(date.clone().add(1, 'month'));
+    this.setState({ selectedDate: date }, async () => {
       if (isUpdate) {
         await this.updateCacheDate();
         this.refreshGoalHistory().catch(() => null);
         this.updateCalendarData().catch(() => null);
       }
     });
-
   }
 
   render() {
     return (
-      <div style={{height: '100%'}}>
+      <div style={{ height: '100%' }}>
         <div className={styles.container}>
           <GoalCalendar
             ref={(box) => (box ? (this.goalCalendar = box) : null)}
@@ -145,31 +157,31 @@ export default class GoalPage extends React.Component {
           />
 
           <div className={styles.GoalItemBox}>
-            {this.showGoals.map((goal: any) =>
-              <GoalItem goal={goal}
-                        key={goal.objectId}
-                        afterOperation={() => this.refreshAll()}
-                        onEdit={() =>
-                          this.goalAddBox?.toggleAddGoalShow({
-                            force: true,
-                            day: this.state.selectedDate,
-                            editGoal: goal,
-                          })}
+            {this.showGoals.map((goal: any) => (
+              <GoalItem
+                goal={goal}
+                key={goal.objectId}
+                afterOperation={() => this.refreshAll()}
+                onEdit={() =>
+                  this.goalAddBox?.toggleAddGoalShow({
+                    force: true,
+                    day: this.state.selectedDate,
+                    editGoal: goal,
+                  })
+                }
               />
-            )}
-            {this.showGoalHistory.map((history: any) =>
-              <GoalHistoryItem key={history.objectId} history={history}/>
-            )}
+            ))}
+            {this.showGoalHistory.map((history: any) => (
+              <GoalHistoryItem key={history.objectId} history={history} />
+            ))}
           </div>
           <div className={styles.addItemBox}>
             <Button
               type="dashed"
               className={styles.addItemBtn}
-              onClick={() =>
-                this.goalAddBox?.toggleAddGoalShow({day: this.state.selectedDate})
-              }
+              onClick={() => this.goalAddBox?.toggleAddGoalShow({ day: this.state.selectedDate })}
             >
-              <PlusOutlined/>
+              <PlusOutlined />
             </Button>
           </div>
         </div>
