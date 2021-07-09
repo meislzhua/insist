@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './index.less';
-import type {FormInstance} from "antd";
+import {FormInstance, Radio} from "antd";
 import {Button, Drawer, Form, Input, message, Select, DatePicker, Tag} from "antd";
 import moment from "moment";
 import type {Goal} from "@/services/Dao/struct/goal/Goal";
@@ -8,6 +8,7 @@ import {PlusOutlined} from "@ant-design/icons/lib";
 import GoalTagItem from "@/pages/Goal/components/GoalTagItem";
 import type {GoalTag} from '@/services/Dao/struct/goal/GoalTag';
 import {Dao} from "@/services/Dao";
+import {GoalPriority} from "@/services/Dao/struct/goal/Goal";
 
 interface GoalAddBoxProps {
   onSubmit?: (goal: Goal) => void;
@@ -123,7 +124,7 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
         onClose={() => this.toggleAddGoalShow()}
         visible={this.state.isGoalAddShow}
         bodyStyle={{padding: "5px"}}
-        height={"330px"}
+        height={"400px"}
         className={styles.addBox}
         footer={
           <Button block
@@ -185,6 +186,19 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
               message: '连目标都没有,这样和咸鱼有什么区别!',
             },
           ]}><Input placeholder="你的目标是?"/></Form.Item>
+          <Form.Item label={"优先级"} name={'priority'}>
+            <Radio.Group
+              style={{width: "100%"}}
+              size={"small"}
+              options={[
+                {label: "不重要", value: GoalPriority.Optional},
+                {label: "普通", value: GoalPriority.Normal},
+                {label: "高优先", value: GoalPriority.High},
+              ]}
+              defaultValue={GoalPriority.Normal}
+            />
+          </Form.Item>
+
           <Form.Item label="Tag">
             {tags.map((tag: GoalTag) => <GoalTagItem key={tag.name} tag={tag}/>)}
             {isAddTag && (
@@ -204,7 +218,6 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
               <Tag onClick={() => this.event_addTag()} className={styles.addTag}><PlusOutlined/></Tag>
             )}
           </Form.Item>
-
 
         </Form>
       </Drawer>

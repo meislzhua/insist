@@ -11,7 +11,14 @@ export interface Goal extends AVObject {
   appoint?: number
   appointDate?: Date,
   tags: GoalTag[]
+  priority?: GoalPriority
 }
 
+
+export enum GoalPriority {
+  Optional = 1,
+  Normal = 3,
+  High = 5
+}
 
 
