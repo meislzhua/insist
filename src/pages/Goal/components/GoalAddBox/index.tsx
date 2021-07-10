@@ -80,7 +80,8 @@ export default class GoalAddBox extends React.Component<GoalAddBoxProps> {
   async event_submitAddTag() {
     const {tags, newTag} = this.state;
     if (tags.find((tag: GoalTag) => tag.name === newTag)) return message.error(`已存在相同的tag: ${newTag}`);
-    const tag: any = {name: this.addTagInput?.current?.input.value || ""};
+    const colorName = GoalTagItem.colors[Math.floor(Math.random() * GoalTagItem.colors.length)];
+    const tag: any = {name: this.addTagInput?.current?.input.value || "", colorName};
     return Dao.goal.addGoalTag({tag})
       .then(newTags => this.setState({tags: [...tags, newTags]}))
       .then(() => message.success("成功添加"))
